@@ -1,10 +1,23 @@
+import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
     const [url, setUrl] = useState("");
     const router = useRouter();
+
+    useEffect(() => {
+        // On mount, check if app was opened with a shared URL
+        Linking.getInitialURL().then((url) => {
+            if (url) {
+                const parsed = Linking.parse(url);
+                if (parsed.queryParams?.url) {
+                    router.replace({ pathname: "/webview", params: { url: parsed.queryParams.url as string } });
+                }
+            }
+        });
+    }, []);
 
     return (
         <View style={styles.container}>
